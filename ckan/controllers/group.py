@@ -598,25 +598,24 @@ class GroupController(base.BaseController):
 
         context = {'model': model, 'session': model.Session,
                    'user': c.user or c.author}
-
         try:
             self._check_access('group_delete', context, {'id': id})
         except NotAuthorized:
-            abort(401, _('Unauthorized to delete group %s') % '')
+            abort(401, _('Unauthorized to delete %s %s') % (self.group_type, ''))
 
         try:
             if request.method == 'POST':
                 self._action('group_delete')(context, {'id': id})
-                if self.group_type == 'organization':
-                    h.flash_notice(_('Organization has been deleted.'))
+                h.flash_notice(_('%s has been deleted.' % self.group_type.capitalize()))
+                if (self.group_type == 'node'):
+                   h.redirect_to(h.url_for(self.group_type))
                 else:
-                    h.flash_notice(_('Group has been deleted.'))
-                self._redirect_to(controller='group', action='index')
+                    self._redirect_to(controller=self.group_type, action='index')
             c.group_dict = self._action('group_show')(context, {'id': id})
         except NotAuthorized:
-            abort(401, _('Unauthorized to delete group %s') % '')
+            abort(401, _('Unauthorized to delete %s %s') % (self.group_type, ''))
         except NotFound:
-            abort(404, _('Group not found'))
+            abort(404, _('%s not found') % self.group_type.capitalize())
         return self._render_template('group/confirm_delete.html')
 
     def members(self, id):
@@ -629,9 +628,9 @@ class GroupController(base.BaseController):
             )
             c.group_dict = self._action('group_show')(context, {'id': id})
         except NotAuthorized:
-            abort(401, _('Unauthorized to delete group %s') % '')
+            abort(401, _('Unauthorized to delete %s %s') % (self.group_type, ''))
         except NotFound:
-            abort(404, _('Group not found'))
+            abort(404, _('%s not found') % self.group_type.capitalize())
         return self._render_template('group/members.html')
 
     def member_new(self, id):
