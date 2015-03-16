@@ -336,7 +336,7 @@ def group_delete(context, data_dict):
     :type id: string
 
     '''
-    return _group_or_org_delete(context, data_dict)
+    return _group_or_org_purge(context, data_dict)
 
 def organization_delete(context, data_dict):
     '''Delete an organization.
@@ -347,7 +347,7 @@ def organization_delete(context, data_dict):
     :type id: string
 
     '''
-    return _group_or_org_delete(context, data_dict, is_org=True)
+    return _group_or_org_purge(context, data_dict, is_org=True)
 
 def _group_or_org_purge(context, data_dict, is_org=False):
     '''Purge a group or organization.
@@ -377,9 +377,9 @@ def _group_or_org_purge(context, data_dict, is_org=False):
             raise NotFound('Group was not found')
 
     if is_org:
-        _check_access('organization_purge', context, data_dict)
+        _check_access('organization_delete', context, data_dict)
     else:
-        _check_access('group_purge', context, data_dict)
+        _check_access('group_delete', context, data_dict)
 
     members = model.Session.query(model.Member)
     members = members.filter(model.Member.group_id == group.id)
