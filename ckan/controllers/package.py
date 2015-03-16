@@ -1308,7 +1308,10 @@ class PackageController(base.BaseController):
 
         context['is_member'] = True
         users_groups = get_action('group_list_authz')(context, data_dict)
-
+        # Remove all groups which type is set to 'node'
+        for item in users_groups[:]:
+            if item['type'] == 'node':
+                users_groups.remove(item)
         pkg_group_ids = set(group['id'] for group
                          in c.pkg_dict.get('groups', []))
         user_group_ids = set(group['id'] for group
