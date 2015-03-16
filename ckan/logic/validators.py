@@ -424,8 +424,14 @@ def group_name_validator(key, data, errors, context):
     if group_id and group_id is not missing:
         query = query.filter(model.Group.id <> group_id)
     result = query.first()
+    if 'country_code' in context['schema_keys']:
+        group_type = 'node'
+    elif data.get(key[:-1] + ('is_organization',)):
+        group_type = 'organization'
+    else:
+        group_type = 'group'
     if result:
-        errors[key].append(_('Group name already exists in database'))
+        errors[key].append(_("{0} name already exists in database".format(group_type.capitalize())))
 
 def tag_length_validator(value, context):
 

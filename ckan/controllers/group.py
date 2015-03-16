@@ -171,7 +171,7 @@ class GroupController(base.BaseController):
     def read(self, id, limit=20):
         group_type = self._get_group_type(id.split('@')[0])
         if group_type != self.group_type:
-            abort(404, _('Incorrect group type'))
+            abort(404, _("Incorrect {0} type".format(self.group_type)))
 
         context = {'model': model, 'session': model.Session,
                    'user': c.user or c.author,
