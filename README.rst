@@ -15,8 +15,8 @@ system that provides a powerful platform for cataloging, storing and accessing
 datasets with a rich front-end, full API (for both data and catalog), visualization
 tools and more. Read more at `ckan.org <http://ckan.org/>`_.
 
-This is a fork from the CKAN v2.3 with added support for various group types 
-(not just original groups and organizations).
+**This is a fork from the CKAN v2.3 with added support for various group types 
+(not just original groups and organizations).**
 
 
 Installation
