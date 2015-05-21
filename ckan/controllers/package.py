@@ -522,7 +522,8 @@ class PackageController(base.BaseController):
 
         context = {'model': model, 'session': model.Session,
                    'user': c.user or c.author, 'auth_user_obj': c.userobj,
-                   'save': 'save' in request.params}
+                   'save': 'save' in request.params,
+                   'next_phase': 'save' in request.params and request.params.get('save') == "next_phase"}
 
         # Package needs to have a organization group in the call to
         # check_access and also to save it
@@ -784,9 +785,9 @@ class PackageController(base.BaseController):
                 old_data.update(data)
             data = old_data
         except NotAuthorized:
-            abort(401, _('Unauthorized to read package %s') % '')
+            abort(401, _('Unauthorized to read training material %s') % '')
         except NotFound:
-            abort(404, _('Dataset not found'))
+            abort(404, _('Training material not found'))
         # are we doing a multiphase add?
         if data.get('state', '').startswith('draft'):
             c.form_action = h.url_for(controller='package', action='new')
@@ -908,7 +909,11 @@ class PackageController(base.BaseController):
         # partially created so we need to know if we actually are updating or
         # this is a real new.
         is_an_update = False
-        ckan_phase = request.params.get('_ckan_phase')
+        if context['next_phase']:
+            ckan_phase = request.params.get('_ckan_phase')
+        else:
+            ckan_phase = None
+
         from ckan.lib.search import SearchIndexError
         try:
             data_dict = clean_dict(dict_fns.unflatten(
@@ -960,9 +965,9 @@ class PackageController(base.BaseController):
 
             self._form_save_redirect(pkg_dict['name'], 'new', package_type=package_type)
         except NotAuthorized:
-            abort(401, _('Unauthorized to read package %s') % '')
+            abort(401, _('Unauthorized to read training material %s') % '')
         except NotFound, e:
-            abort(404, _('Dataset not found'))
+            abort(404, _('Training material not found'))
         except dict_fns.DataError:
             abort(400, _(u'Integrity Error'))
         except SearchIndexError, e:
