@@ -680,27 +680,34 @@ class PackageController(base.BaseController):
                 try:
                     data_dict = get_action('package_show')(context, {'id': id})
                 except NotAuthorized:
-                    abort(401, _('Unauthorized to update dataset'))
+                    abort(401, _('Unauthorized to update training material'))
                 except NotFound:
                     abort(404,
-                      _('The dataset {id} could not be found.').format(id=id))
-                if not len(data_dict['resources']):
-                    # no data so keep on page
-                    msg = _('You must add at least one data resource')
-                    # On new templates do not use flash message
-                    if g.legacy_templates:
-                        h.flash_error(msg)
-                        redirect(h.url_for(controller='package',
-                                           action='new_resource', id=id))
-                    else:
-                        errors = {}
-                        error_summary = {_('Error'): msg}
-                        return self.new_resource(id, data, errors, error_summary)
-                # we have a resource so let them add metadata
-                redirect(h.url_for(controller='package',
-                                   action='new_metadata', id=id))
+                      _('The training material {id} could not be found.').format(id=id))
+                # if not len(data_dict['resources']):
+                #     # no data so keep on page
+                #     msg = _('You must add at least one data resource')
+                #     # On new templates do not use flash message
+                #     if g.legacy_templates:
+                #         h.flash_error(msg)
+                #         redirect(h.url_for(controller='package',
+                #                            action='new_resource', id=id))
+                #     else:
+                #         errors = {}
+                #         error_summary = {_('Error'): msg}
+                #         return self.new_resource(id, data, errors, error_summary)
+                # # we have a resource so let them add metadata
+                # redirect(h.url_for(controller='package',
+                #                    action='new_metadata', id=id))
 
             data['package_id'] = id
+            if not data_provided and save_action == "go-metadata":
+                data_dict = get_action('package_show')(context, {'id': id})
+                get_action('package_update')(
+                    dict(context, allow_state_change=True),
+                    dict(data_dict, state='active'))
+                redirect(h.url_for(controller='package',
+                                   action='read', id=id))
             try:
                 if resource_id:
                     data['id'] = resource_id
@@ -715,7 +722,8 @@ class PackageController(base.BaseController):
                 abort(401, _('Unauthorized to create a resource'))
             except NotFound:
                 abort(404,
-                    _('The dataset {id} could not be found.').format(id=id))
+                    _('The training material {id} could not be found.').format(id=id))
+
             if save_action == 'go-metadata':
                 # XXX race condition if another user edits/deletes
                 data_dict = get_action('package_show')(context, {'id': id})
