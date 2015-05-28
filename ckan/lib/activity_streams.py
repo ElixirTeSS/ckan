@@ -201,7 +201,7 @@ activity_stream_string_icons = {
   'deleted package_extra': 'edit',
   'deleted resource': 'file',
   'new group': 'group',
-  'new package': 'sitemap',
+  'new package': 'book',
   'new package_extra': 'edit',
   'new resource': 'file',
   'new user': 'user',
